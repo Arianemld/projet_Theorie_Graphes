@@ -1,6 +1,10 @@
 import choix_fichier
+#from afficher_matrice import afficher_matrice
 
 #sommet
+
+
+
 def sommet(choix_fichier):
     with open(choix_fichier, 'r') as fichier:
 
@@ -58,8 +62,9 @@ def trace_arc(nom_sommet, choix_fichier):
     arcs.sort(key=lambda x: x[0])
 
     # Affichage des arcs
-    for arc in arcs:
-        print(f"{arc[0]} -> {arc[1]}")
+    #for arc in arcs:
+        #print(f"{arc[0]} -> {arc[1]} = {arc[0]}")
+
 
     return arcs
 
