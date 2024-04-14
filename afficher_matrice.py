@@ -18,7 +18,11 @@ def afficher_matrice(choix_fichier):
     arcs = trace_arc(sommets, choix_fichier)
     for arc in arcs:
         ligne, colonne = arc
-        grille[ligne + 1][colonne + 1] = str(ligne)
+        #condition car y'avait problème d'index
+        if 0 <= ligne < nb_sommets and 0 <= colonne < nb_sommets:
+            grille[ligne + 1][colonne + 1] = str(ligne)
+
+
 
     # Afficher la grille
     for ligne in grille:

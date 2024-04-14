@@ -49,23 +49,26 @@ def trace_arc(nom_sommet, choix_fichier):
                 sommet_depart = int(valeurs[0])
                 for valeur in valeurs[1:]:
                     sommet_arrivee = int(valeur)
-                    if sommet_depart < sommet_arrivee:
-                        arc = (sommet_depart, sommet_arrivee)
-                    else:
-                        arc = (sommet_arrivee, sommet_depart)
+
+                    arc = (sommet_arrivee, sommet_depart)
+                   #arcs.add(arc)
                     if arc[0] == arc[1]:  # Vérifier si arc[0] est égal à arc[1]
                         arc = (arc[0], len(nom_sommet) - 1)  # Remplacer arc[1] par sommet_n_plus_1
-                    arcs.append(arc)
+                    if arc not in arcs:
+                        arcs.append(arc)
+
 
 
     # Tri des arcs par sommet de départ
-    arcs.sort(key=lambda x: x[0])
-
-    # Affichage des arcs
-    #for arc in arcs:
-        #print(f"{arc[0]} -> {arc[1]} = {arc[0]}")
+    arc_sorted = sorted(arcs, key=lambda x: x[0])
 
 
-    return arcs
+    return arc_sorted
+
+
+
+
+
+
 
 

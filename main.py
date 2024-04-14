@@ -1,6 +1,7 @@
 from afficher_matrice import afficher_matrice
 from choix_fichier import choisir_fichier
 from sommet_arc import sommet, nom_arc, trace_arc
+from verif_ordo import verif_ordo
 
 
 def print_hi(name):
@@ -17,7 +18,7 @@ def print_hi(name):
 
     if noms_sommets is not None:
         # Affichage des noms des sommets
-        print("Voici les différents sommets que vous avez :", noms_sommets)
+        print("\n Voici les différents sommets que vous avez :", noms_sommets)
 
         # Affichage des arcs du graphe d'ordonnancement
         print("Arcs du graphe d'ordonnancement :")
@@ -27,12 +28,12 @@ def print_hi(name):
             print(f"{arc[0]} -> {arc[1]} = {arc[0]}")
 
         #affichage de la grille
-        print("Grille correspondante au graphe :")
+        print("Grille correspondante au graphe :\n")
         grille = afficher_matrice(fichier)
 
-
-
-
+        #verification ordonnancement
+        print("\nVérifions s'il s'agit bien d'un tableau d'ordonnancement :\n")
+        verif_ordo(fichier)
 
 
 
