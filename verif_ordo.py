@@ -60,11 +60,34 @@ def verif_ordo(choix_fichier):
         sommets.pop()
         print("Suppresion des points d'entrée:", sommets)
         print("Points supprimés:", last_val)
-    print()
+        print("sommets restant : aucun")
+    #print()
+
+    #circuit ou non
+    if len(sommets) == 0:
+        print("Il n'y a pas de circuit")
+    else:
+        print("Il y a un circuit")
+
+    #arc négatif
+    arcs_negatifs = False
+
+    for arc in arcs:
+        if any(val<0 for val in arc):
+            arcs_negatifs = True
+            break
+
+    if arcs_negatifs:
+        print("Il y a des arcs négatifs")
+    else:
+        print("Pas d'arc négatif")
 
 
-
-
+    #graphe d'ordonnancement ou non
+    if len(sommets) == 0 and not arcs_negatifs:
+        print("C'EST UN GRAPHE D'ORDONNANCEMENT")
+    else:
+        print()
 
 
 
