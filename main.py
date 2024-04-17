@@ -37,10 +37,10 @@ def print_hi(name):
 
 
         # Calcul des rangs des sommets
-        rangs = calculer_rangs(grille)
+        rangs = calculer_rangs(arcs)
         print("\nRangs des sommets :")
-        for i in range(len(grille)):
-            print(f"Sommet {i}: {rangs.get(i)}")
+        for i in range(len(noms_sommets)):
+            print(f"Sommet {noms_sommets[i]}: {rangs.get(i)}")
 
     else:
         print("Erreur lors de la lecture des noms de sommets.")

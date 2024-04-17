@@ -69,6 +69,3 @@ def trace_arc(nom_sommet, choix_fichier):
 
 
 
-
-
-

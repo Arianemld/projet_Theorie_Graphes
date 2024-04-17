@@ -31,5 +31,3 @@ def afficher_matrice(choix_fichier):
         print()  # Nouvelle ligne après chaque ligne de la grille
 
     return grille
-
-
