@@ -1,66 +1,71 @@
-from collections import defaultdict
-
+from collections import defaultdict, deque
 from sommet_arc import nom_arc, trace_arc
-
 
 def verif_ordo(choix_fichier):
     sommets = nom_arc(choix_fichier)
-    point_entree = sommets[0]
-    point_sortie = sommets[-1]
+    arcs = trace_arc(sommets, choix_fichier)
 
-    print("Il y a un seul point d'entrée :", point_entree)
-    print("Il y a un seul point de sortie :", point_sortie)
-    print()
+    # Création du graphe et initialisation des prédécesseurs pour tous les sommets concernés
+    graph = defaultdict(list)
+    in_degree = defaultdict(int)  # Utilisation de defaultdict pour éviter les KeyError
 
-    print("* Détection de circuit")
-    print("* Méthode d’élimination des points d’entrée")
-    #print("liste des sommets: ", sommets)
-    print("Points d'entrée :", point_entree)
-    print("Suppression des points d'entrée")
+    for origine, destination in arcs:
+        graph[origine].append(destination)
+        in_degree[destination] += 1
 
-    #suppression du point d'entrée 0
-    sommets.remove(point_entree)
-    # Afficher la liste des sommets après suppression
-    print("Liste des sommets après suppression du point d'entrée :", sommets)
-    print()
+    # Points d'entrée pour l'algorithme (sommets sans prédécesseurs)
+    queue = deque([s for s in sommets if in_degree[s] == 0])
+    visited_count = 0
 
-    noms_sommets = nom_arc(choix_fichier)
+    while queue:
+        current = queue.popleft()
+        visited_count += 1
+        for neighbor in graph[current]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
 
-    arcs = trace_arc(noms_sommets, choix_fichier)
+    # Vérification de la présence de circuit
+    if visited_count == len(sommets):
+        print("Pas de circuit détecté, le graphe peut être ordonnancé.")
+        return False  # Pas de circuit
+    else:
+        print("Un circuit a été détecté, vérification impossible.")
+        remaining_nodes = [s for s, degree in in_degree.items() if degree > 0]
+        print(f"Sommets restant avec des prédécesseurs non supprimés : {remaining_nodes}")
+        return True  # Présence d'un circuit
 
-    # Créer un dictionnaire pour stocker les valeurs de arc[1] pour chaque arc[0]
-    arc_values = defaultdict(list)
+    
+def calculer_rangs(grille):
+    nb_sommets = len(grille)  # suppose que grille est carrée
+    in_degree = [0] * nb_sommets
+    graph = defaultdict(list)
 
-    # Parcourir les arcs et stocker les valeurs de arc[1] pour chaque arc[0]
-    for arc in arcs:
-        arc_values[arc[0]].append(arc[1])
+    # Construction du graphe à partir de la grille
+    for i in range(nb_sommets):
+        for j in range(nb_sommets):
+            if grille[i][j] != '*' and grille[i][j] != '0':
+                graph[i].append(j)  # i dépend de j
+                in_degree[j] += 1
 
+    # Tâches sans prédécesseurs
+    sources = deque([i for i in range(nb_sommets) if in_degree[i] == 0])
+    ranks = {}
+    current_rank = 0
 
+    # Tri topologique et affectation des rangs
+    while sources:
+        next_sources = deque()
+        for node in sources:
+            ranks[node] = current_rank
+            for neighbor in graph[node]:
+                in_degree[neighbor] -= 1
+                if in_degree[neighbor] == 0:
+                    next_sources.append(neighbor)
+        sources = next_sources
+        current_rank += 1
 
-    # Afficher les valeurs pour chaque arc[0] et supprimer les valeurs de la liste
-    for sommet, valeurs in arc_values.items():
-        suppression_effectuee = False
-        #print(f"Arcs partant de {sommet}: {', '.join(map(str, valeurs))}")
-        # stocker les points supprimés
-        points_supp = []
-        for valeur in valeurs:
-            if str(valeur) in sommets:
-                sommets.remove(str(valeur))
-                points_supp.append(valeur)
-                suppression_effectuee = True
-        if suppression_effectuee:
-            print("Suppresion des points d'entrée:", sommets)
-            print("Points supprimés:", ','.join(map(str, points_supp)))
-        print()
-
-
-    #suppresion du dernier élément
-    if len(sommets) == 1 and sommets[0] == point_sortie:
-        last_val = sommets[0]
-        sommets.pop()
-        print("Suppresion des points d'entrée:", sommets)
-        print("Points supprimés:", last_val)
-    print()
+    return ranks
 
 
 
@@ -70,7 +75,6 @@ def verif_ordo(choix_fichier):
 
 
 
-    return point_entree, point_sortie
 
 
 

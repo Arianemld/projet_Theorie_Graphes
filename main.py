@@ -1,7 +1,7 @@
 from afficher_matrice import afficher_matrice
 from choix_fichier import choisir_fichier
 from sommet_arc import sommet, nom_arc, trace_arc
-from verif_ordo import verif_ordo
+from verif_ordo import verif_ordo, calculer_rangs
 
 
 def print_hi(name):
@@ -36,7 +36,11 @@ def print_hi(name):
         verif_ordo(fichier)
 
 
-
+        # Calcul des rangs des sommets
+        rangs = calculer_rangs(grille)
+        print("\nRangs des sommets :")
+        for i in range(len(grille)):
+            print(f"Sommet {i}: {rangs.get(i)}")
 
     else:
         print("Erreur lors de la lecture des noms de sommets.")
