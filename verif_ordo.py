@@ -1,9 +1,6 @@
 from collections import defaultdict, deque
 from sommet_arc import nom_arc, trace_arc
 
-from collections import defaultdict
-
-from sommet_arc import nom_arc, trace_arc
 
 
 def verif_ordo(choix_fichier):

@@ -4,6 +4,7 @@ from sommet_arc import sommet, nom_arc, trace_arc
 from verif_ordo import verif_ordo, calculer_rangs
 
 
+
 def print_hi(name):
     print("\n                 PROJET - THEORIE DES GRAPHES\n\n")
     fichier = choisir_fichier()
@@ -44,7 +45,6 @@ def print_hi(name):
 
     else:
         print("Erreur lors de la lecture des noms de sommets.")
-
 
 
 
