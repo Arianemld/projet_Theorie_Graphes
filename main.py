@@ -1,9 +1,11 @@
+# Import des modules nécessaires
+from collections import defaultdict
 from afficher_matrice import afficher_matrice
 from choix_fichier import choisir_fichier
 from sommet_arc import sommet as sommet_fonc, nom_arc, trace_arc
 from verif_ordo import verif_ordo, calculer_rangs, calculer_calendrier_au_plus_tot, calculer_calendrier_au_plus_tard, calculer_marges
-from collections import defaultdict
 
+# Définition de la fonction principale
 def print_hi(name):
     print("\n                 PROJET - THEORIE DES GRAPHES\n\n")
     fichier = choisir_fichier()
@@ -58,5 +60,6 @@ def print_hi(name):
     else:
         print("Erreur lors de la lecture des noms de sommets.")
 
+# Appel de la fonction principale si le script est exécuté en tant que programme principal
 if __name__ == '__main__':
     print_hi('PyCharm')

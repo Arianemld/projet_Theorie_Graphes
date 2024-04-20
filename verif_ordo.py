@@ -61,7 +61,7 @@ def verif_ordo(choix_fichier):
         sommets.pop()
         print("Suppresion des points d'entrée:", sommets)
         print("Points supprimés:", last_val)
-        print("sommets restant : aucun")
+        print("Sommets restants : aucun")
     #print()
 
     #circuit ou non
@@ -173,7 +173,7 @@ def calculer_calendrier_au_plus_tard(graph, durations, point_sortie, early_start
     # Initialisation du calendrier au plus tard avec la valeur du calendrier au plus tôt pour le point de sortie
     late_finish = {node: float('inf') for node in graph}
 
-    # Tâches sans successeurs (le point de sortie)
+    # Tâches sans prédécesseurs (le point de sortie)
     targets = {node for successors in graph.values() for node in successors}
     targets.add(point_sortie)
 
@@ -183,7 +183,9 @@ def calculer_calendrier_au_plus_tard(graph, durations, point_sortie, early_start
             return
         for predecessor, successors in graph.items():
             if node in successors:
+                # Mise à jour de l'heure de fin au plus tard pour le nœud actuel
                 late_finish[node] = min(late_finish[node], late_finish[predecessor] - durations[(predecessor, node)])
+                # Appel récursif DFS pour le prédécesseur
                 dfs(predecessor)
 
     # Déclencher DFS à partir du point de sortie
@@ -197,13 +199,13 @@ def calculer_calendrier_au_plus_tard(graph, durations, point_sortie, early_start
 
 
 
-
 def calculer_marges(early_start, late_finish):
     total_floats = {}
     for node in early_start:
         total_float = late_finish[node] - early_start[node]
         total_floats[node] = total_float
     return total_floats
+
 
 
 
