@@ -38,7 +38,7 @@ def print_hi(name):
 
                 durations = {tuple(arc[:2]): 1 for arc in arcs}
                 early_start = calculer_calendrier_au_plus_tot(graph, durations, point_entree, point_sortie)
-                
+                    
                 late_finish = calculer_calendrier_au_plus_tard(graph, durations, point_sortie, early_start)
                 marges = calculer_marges(early_start, late_finish)
 
@@ -53,8 +53,6 @@ def print_hi(name):
                 print("\nMarges:")
                 for node, marge in marges.items():
                     print(f"{node}: Marge totale de {marge}")
-            else:
-                print("\nLe graphe n'est pas un graphe d'ordonnancement.")
         else:
             print("\nErreur lors de la vérification des propriétés.")
     else:
