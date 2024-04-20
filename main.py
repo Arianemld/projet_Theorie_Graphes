@@ -1,63 +1,64 @@
 from afficher_matrice import afficher_matrice
 from choix_fichier import choisir_fichier
-from sommet_arc import sommet, nom_arc, trace_arc
-from verif_ordo import verif_ordo, calculer_rangs
-
-
+from sommet_arc import sommet as sommet_fonc, nom_arc, trace_arc
+from verif_ordo import verif_ordo, calculer_rangs, calculer_calendrier_au_plus_tot, calculer_calendrier_au_plus_tard, calculer_marges
+from collections import defaultdict
 
 def print_hi(name):
     print("\n                 PROJET - THEORIE DES GRAPHES\n\n")
     fichier = choisir_fichier()
     print("Vous avez choisi d'analyser le fichier :", fichier)
 
-    # Lecture du fichier txt pour obtenir les sommets et les arcs
-
-    sommets = sommet(fichier)
-
-    # Obtention des noms des sommets
+    sommets = sommet_fonc(fichier)
     noms_sommets = nom_arc(fichier)
 
     if noms_sommets is not None:
-        # Affichage des noms des sommets
-        print("\n Voici les différents sommets que vous avez :", noms_sommets)
-
-        # Affichage des arcs du graphe d'ordonnancement
-        print("Arcs du graphe d'ordonnancement :")
+        print("\nVoici les différents sommets que vous avez :", noms_sommets)
         arcs = trace_arc(noms_sommets, fichier)
-        # Affichage des arcs
+        print("Arcs du graphe d'ordonnancement :")
         for arc in arcs:
-            print(f"{arc[0]} -> {arc[1]} = {arc[0]}")
+            print(f"{arc[0]} -> {arc[1]}")
 
-        #affichage de la grille
-        print("Grille correspondante au graphe :\n")
         grille = afficher_matrice(fichier)
+        print("Grille correspondante au graphe :\n")
 
-        #verification ordonnancement
-        print("\nVérifions s'il s'agit bien d'un tableau d'ordonnancement :\n")
-        verif_ordo(fichier)
+        verif_result = verif_ordo(fichier)
+        if verif_result:
+            point_entree, point_sortie, is_ordonnancement = verif_result
+            print(f"Est-ce un graph d'ordonnancement ?  {is_ordonnancement}")
+            if is_ordonnancement:
+                rangs = calculer_rangs(arcs)
+                print("\nRangs des sommets :")
+                for sommet in rangs:
+                    print(f"Sommet {sommet}: Rang {rangs[sommet]}")
 
+                graph = defaultdict(list)
+                for arc in arcs:
+                    graph[arc[0]].append(arc[1])
 
-        # Calcul des rangs des sommets
-        rangs = calculer_rangs(arcs)
-        print("\nRangs des sommets :")
-        for i in range(len(noms_sommets)):
-            print(f"Sommet {noms_sommets[i]}: {rangs.get(i)}")
+                durations = {tuple(arc[:2]): 1 for arc in arcs}
+                early_start = calculer_calendrier_au_plus_tot(graph, durations, point_entree, point_sortie)
+                
+                late_finish = calculer_calendrier_au_plus_tard(graph, durations, point_sortie, early_start)
+                marges = calculer_marges(early_start, late_finish)
 
+                print("\nCalendrier au plus tôt:")
+                for node, time in early_start.items():
+                    print(f"{node}: Début au plus tôt à {time}")
+
+                print("\nCalendrier au plus tard:")
+                for node, time in late_finish.items():
+                    print(f"{node}: Fin au plus tard à {time}")
+
+                print("\nMarges:")
+                for node, marge in marges.items():
+                    print(f"{node}: Marge totale de {marge}")
+            else:
+                print("\nLe graphe n'est pas un graphe d'ordonnancement.")
+        else:
+            print("\nErreur lors de la vérification des propriétés.")
     else:
         print("Erreur lors de la lecture des noms de sommets.")
 
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
     print_hi('PyCharm')
-
-

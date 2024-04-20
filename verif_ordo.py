@@ -3,6 +3,7 @@ from sommet_arc import nom_arc, trace_arc
 
 
 
+
 def verif_ordo(choix_fichier):
     sommets = nom_arc(choix_fichier)
     point_entree = sommets[0]
@@ -85,15 +86,10 @@ def verif_ordo(choix_fichier):
 
     #graphe d'ordonnancement ou non
     if len(sommets) == 0 and not arcs_negatifs:
-        print("C'EST UN GRAPHE D'ORDONNANCEMENT")
+        return point_entree, point_sortie, True
     else:
-        print()
+        return point_entree, point_sortie, False
 
-
-
-
-
-    return point_entree, point_sortie
     
 def calculer_rangs(arcs):
     # Obtention de tous les sommets mentionnés dans les arcs
@@ -131,6 +127,83 @@ def calculer_rangs(arcs):
 
 
 
+def calculer_calendrier_au_plus_tot(graph, durations, point_entree, point_sortie):
+    """
+    Cette fonction calcule le calendrier au plus tôt pour chaque tâche dans le graphe d'ordonnancement.
+
+    Args:
+        graph (dict): Le graphe d'ordonnancement représenté sous forme de dictionnaire.
+        durations (dict): Dictionnaire des durées de chaque arc.
+        point_entree (int): Le point d'entrée du graphe.
+        point_sortie (int): Le point de sortie du graphe.
+
+    Returns:
+        dict: Un dictionnaire contenant les heures de début au plus tôt pour chaque tâche.
+    """
+    # Initialisation du dictionnaire des heures de début au plus tôt
+    early_start = {point_entree: 0}
+    
+    # File d'attente pour le parcours du graphe
+    queue = [point_entree]
+
+    # Parcours du graphe en largeur
+    while queue:
+        current = queue.pop(0)
+        successors = graph[current]
+
+        # Parcours des successeurs du sommet courant
+        for successor in successors:
+            # Mise à jour de l'heure de début au plus tôt pour le successeur
+            if successor not in early_start:
+                early_start[successor] = early_start[current] + durations[(current, successor)]
+            else:
+                early_start[successor] = max(early_start[successor], early_start[current] + durations[(current, successor)])
+            
+            # Ajout du successeur à la file d'attente
+            queue.append(successor)
+    
+    return early_start
+
+
+
+
+
+
+def calculer_calendrier_au_plus_tard(graph, durations, point_sortie, early_start):
+    # Initialisation du calendrier au plus tard avec la valeur du calendrier au plus tôt pour le point de sortie
+    late_finish = {node: float('inf') for node in graph}
+
+    # Tâches sans successeurs (le point de sortie)
+    targets = {node for successors in graph.values() for node in successors}
+    targets.add(point_sortie)
+
+    # Parcours du graphe en profondeur (DFS) à partir du point de sortie
+    def dfs(node):
+        if node not in targets:
+            return
+        for predecessor, successors in graph.items():
+            if node in successors:
+                late_finish[node] = min(late_finish[node], late_finish[predecessor] - durations[(predecessor, node)])
+                dfs(predecessor)
+
+    # Déclencher DFS à partir du point de sortie
+    dfs(point_sortie)
+
+    return late_finish
+
+
+
+
+
+
+
+
+def calculer_marges(early_start, late_finish):
+    total_floats = {}
+    for node in early_start:
+        total_float = late_finish[node] - early_start[node]
+        total_floats[node] = total_float
+    return total_floats
 
 
 
