@@ -167,36 +167,28 @@ def calculer_calendriers_et_marges(arcs, durees):
 
 
 def trouver_chemins_critiques(est, lft, durees, arcs):
-    #Initialisation des graphes
+    # Identifier les sommets avec une marge de zéro
+    sommets_critiques = {sommet for sommet, marge in ((v, lft[v] - est[v]) for v in est) if marge == 0}
+
+    # Créer un graphe pour faciliter la recherche des chemins
     graph = defaultdict(list)
-    graph_inv = defaultdict(list)
-
-    # Construction du graphe
     for start, end in arcs:
-        graph[start].append(end)
-        graph_inv[end].append(start)
+        if start in sommets_critiques and end in sommets_critiques:
+            graph[start].append(end)
 
-    # Trouver les tâches critiques
-    taches_critiques = {tache for tache in est if (lft[tache] - est[tache] - durees[tache]) == 0}
-
-    # Trouver les sources
-    sources = [t for t in taches_critiques if all(pred not in taches_critiques for pred in graph_inv[t])]
-
-    # Parcours des chemins critiques
-    chemins_critiques = []
-
-    def parcourir(tache, chemin_en_cours):
-        chemin_en_cours.append(tache)
-        if tache not in graph:
-            chemins_critiques.append(chemin_en_cours.copy())
+    # Fonction récursive pour explorer tous les chemins critiques
+    def explorer_chemin(chemin, node):
+        if not graph[node]:  # Si aucun successeur, chemin terminé
+            chemins_critiques.append(chemin + [node])
         else:
-            for succ in graph[tache]:
-                if lft[succ] - est[succ] - durees[succ] == 0:
-                    parcourir(succ, chemin_en_cours)
-        chemin_en_cours.pop()
+            for successeur in graph[node]:
+                explorer_chemin(chemin + [node], successeur)
 
-    for source in sources:
-        parcourir(source, [])
+    # Lancer l'exploration à partir des sommets sans prédécesseurs dans le sous-ensemble critique
+    chemins_critiques = []
+    sources_critiques = [node for node in sommets_critiques if all(pred not in sommets_critiques for pred, succ in arcs if succ == node)]
+    for source in sources_critiques:
+        explorer_chemin([], source)
 
     return chemins_critiques
 
