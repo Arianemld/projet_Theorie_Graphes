@@ -127,93 +127,77 @@ def calculer_rangs(arcs):
 
 
 
-def calculer_calendrier_au_plus_tot(graph, durations, point_entree, point_sortie):
-    """
-    Cette fonction calcule le calendrier au plus tôt pour chaque tâche dans le graphe d'ordonnancement.
+def calculer_calendriers_et_marges(arcs, durees):
+  # Construction du graphe et calcul du tri topologique
+  graph = defaultdict(list)
+  in_degree = defaultdict(int)
+  for start, end in arcs:
+      graph[start].append(end)
+      in_degree[end] += 1
 
-    Args:
-        graph (dict): Le graphe d'ordonnancement représenté sous forme de dictionnaire.
-        durations (dict): Dictionnaire des durées de chaque arc.
-        point_entree (int): Le point d'entrée du graphe.
-        point_sortie (int): Le point de sortie du graphe.
+  # Liste des sommets sans prédécesseurs (sources)
+  queue = deque([v for v in durees.keys() if in_degree[v] == 0])
+  est = {v: 0 for v in durees.keys()}  # Temps de début au plus tôt
+  lft = {}  # Temps de fin au plus tard
 
-    Returns:
-        dict: Un dictionnaire contenant les heures de début au plus tôt pour chaque tâche.
-    """
-    # Initialisation du dictionnaire des heures de début au plus tôt
-    early_start = {point_entree: 0}
-    
-    # File d'attente pour le parcours du graphe
-    queue = [point_entree]
+  # Calcul du calendrier au plus tôt
+  while queue:
+      node = queue.popleft()
+      current_end_time = est[node] + durees[node]
+      for successor in graph[node]:
+          est[successor] = max(est.get(successor, 0), current_end_time)
+          in_degree[successor] -= 1
+          if in_degree[successor] == 0:
+              queue.append(successor)
 
-    # Parcours du graphe en largeur
-    while queue:
-        current = queue.pop(0)
-        successors = graph[current]
+  # Définir le temps de fin au plus tard du dernier nœud
+  max_completion_time = max(est[v] + durees[v] for v in est)
+  lft = {v: max_completion_time for v in est.keys()}
 
-        # Parcours des successeurs du sommet courant
-        for successor in successors:
-            # Mise à jour de l'heure de début au plus tôt pour le successeur
-            if successor not in early_start:
-                early_start[successor] = early_start[current] + durations[(current, successor)]
-            else:
-                early_start[successor] = max(early_start[successor], early_start[current] + durations[(current, successor)])
-            
-            # Ajout du successeur à la file d'attente
-            queue.append(successor)
-    
-    return early_start
+  # Calcul du calendrier au plus tard
+  for node in reversed(sorted(est, key=est.get)):
+      for predecessor in graph:
+          if node in graph[predecessor]:
+              lft[predecessor] = min(lft[predecessor], lft[node] - durees[predecessor])
 
+  # Calcul des marges
+  margins = {v: lft[v] - est[v]  for v in est.keys()}
 
-
+  return est, lft, margins
 
 
+def trouver_chemins_critiques(est, lft, durees, arcs):
+    #Initialisation des graphes
+    graph = defaultdict(list)
+    graph_inv = defaultdict(list)
 
-def calculer_calendrier_au_plus_tard(graph, durations, point_sortie, early_start):
-    # Initialisation du calendrier au plus tard avec la valeur du calendrier au plus tôt pour le point de sortie
-    late_finish = {node: float('inf') for node in graph}
+    # Construction du graphe
+    for start, end in arcs:
+        graph[start].append(end)
+        graph_inv[end].append(start)
 
-    # Tâches sans prédécesseurs (le point de sortie)
-    targets = {node for successors in graph.values() for node in successors}
-    targets.add(point_sortie)
+    # Trouver les tâches critiques
+    taches_critiques = {tache for tache in est if (lft[tache] - est[tache] - durees[tache]) == 0}
 
-    # Parcours du graphe en profondeur (DFS) à partir du point de sortie
-    def dfs(node):
-        if node not in targets:
-            return
-        for predecessor, successors in graph.items():
-            if node in successors:
-                # Mise à jour de l'heure de fin au plus tard pour le nœud actuel
-                late_finish[node] = min(late_finish[node], late_finish[predecessor] - durations[(predecessor, node)])
-                # Appel récursif DFS pour le prédécesseur
-                dfs(predecessor)
+    # Trouver les sources
+    sources = [t for t in taches_critiques if all(pred not in taches_critiques for pred in graph_inv[t])]
 
-    # Déclencher DFS à partir du point de sortie
-    dfs(point_sortie)
+    # Parcours des chemins critiques
+    chemins_critiques = []
 
-    return late_finish
+    def parcourir(tache, chemin_en_cours):
+        chemin_en_cours.append(tache)
+        if tache not in graph:
+            chemins_critiques.append(chemin_en_cours.copy())
+        else:
+            for succ in graph[tache]:
+                if lft[succ] - est[succ] - durees[succ] == 0:
+                    parcourir(succ, chemin_en_cours)
+        chemin_en_cours.pop()
 
+    for source in sources:
+        parcourir(source, [])
 
-
-
-
-
-
-def calculer_marges(early_start, late_finish):
-    total_floats = {}
-    for node in early_start:
-        total_float = late_finish[node] - early_start[node]
-        total_floats[node] = total_float
-    return total_floats
-
-
-
-
-
-
-
-
-
-
+    return chemins_critiques
 
 

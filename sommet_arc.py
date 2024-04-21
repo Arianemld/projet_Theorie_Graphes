@@ -64,6 +64,22 @@ def trace_arc(nom_sommet, choix_fichier):
 
 
     return arc_sorted
+def lire_durees_et_arcs(choix_fichier):
+  durees = {}
+  arcs = []
+  with open(choix_fichier, 'r') as file:
+    for ligne in file:
+        valeurs = ligne.split()
+        if len(valeurs) > 1:
+            sommet_id = int(valeurs[0])
+            duree_sommet = int(valeurs[1])
+            durees[sommet_id] = duree_sommet
+            # Lire les prédécesseurs si existants
+            for predecesseur in valeurs[2:]:
+                arcs.append((int(predecesseur), sommet_id))  # Créer un arc de chaque prédécesseur au sommet actuel
+
+  return durees, arcs
+
 
 
 
